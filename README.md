@@ -1,4 +1,4 @@
-# Salt-maps
+# Salt-map
 
 Maps tell you the route. salt-map tells you what it costs.
 

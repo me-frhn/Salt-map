@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Learning document</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f6f4fa;--card:#fff;--ink:#1d1a26;--mute:#6b657a;--acc:#7a3fa0;--ok:#1f9d55;--bd:#e2dcee;--code:#efe9f7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15121c;--card:#1f1b2a;--ink:#efeaf8;--mute:#a59cb8;--acc:#b27ad6;--ok:#4cc27f;--bd:#322b44;--code:#2a2438}}
+:root[data-theme="dark"]{--bg:#15121c;--card:#1f1b2a;--ink:#efeaf8;--mute:#a59cb8;--acc:#b27ad6;--ok:#4cc27f;--bd:#322b44;--code:#2a2438}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:2rem;font-weight:800;margin:0}h2{margin:24px 0 8px}h3{margin:20px 0 6px}
+.sub,.m{color:var(--mute)}
+nav{display:flex;gap:8px;margin:16px 0;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:5}
+nav button,.bt{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 14px;cursor:pointer}
+nav button.on,.bt.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+code,pre{font-family:ui-monospace,Consolas,monospace;font-size:.85rem}
+pre{background:var(--code);border-radius:8px;padding:10px;overflow-x:auto;margin:6px 0}
+details{background:var(--card);border:1px solid var(--bd);border-radius:10px;margin:8px 0;padding:8px 12px}
+summary{cursor:pointer;font-weight:600;word-break:break-word}
+.k{font-weight:600;color:var(--acc)}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0}
+.st{border:2px solid var(--bd);border-radius:10px;padding:8px 10px;background:var(--card);font-size:.85rem;text-align:center;transition:.3s}
+.st.on{border-color:var(--ok);background:var(--ok);color:#fff}
+.pan{background:var(--code);border-radius:8px;padding:10px;margin-top:8px;min-height:64px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+td{border-top:1px solid var(--bd);padding:5px 6px;vertical-align:top}td:first-child{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-all;width:46%}
+.ch{display:inline-block;background:var(--acc);color:#fff;border-radius:6px;padding:2px 8px;margin:2px;font-family:ui-monospace,Consolas,monospace;font-size:.85rem}
+input{font:inherit;width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--ink)}
+.pg{display:none}.pg.on{display:block}
+</style>
+</head>
+<body>
+<main>
+<h1>Learning document</h1>
+<p class="sub">Salt-map: everything we did in Days 1 to 3, with what each command is and why we used it. Tap the commands to open them.</p>
+<nav id="nav"></nav>
+<div id="p1" class="pg on"></div><div id="p2" class="pg"></div><div id="p3" class="pg"></div>
+</main>
+<script>
+var R=String.raw;
+function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h)e.innerHTML=h;return e}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function cards(pg,a){a.forEach(function(c){var d=el("details");d.appendChild(el("summary","","<code>"+esc(c[0])+"</code>"));
+d.appendChild(el("div","","<p><span class='k'>What it is:</span> "+c[1]+"</p><p><span class='k'>Why we use it:</span> "+c[2]+"</p>"+(c[3]?"<p><span class='k'>What you see:</span> "+c[3]+"</p>":"")));pg.appendChild(d)})}
+function table(pg,a){var t=el("table");a.forEach(function(r){var tr=el("tr");var c1=el("td");c1.textContent=r[0];tr.appendChild(c1);tr.appendChild(el("td","",r[1]));t.appendChild(tr)});var b=el("div","box");b.appendChild(t);pg.appendChild(b)}
+function stepper(pg,title,boxes,steps){var b=el("div","box","<b>"+title+"</b><p class='m'>Tap a step to see what happens.</p>");var f=el("div","flow"),btn=el("div","flow"),pan=el("div","pan","Tap a step.");
+var bx=boxes.map(function(x){var s=el("div","st",x);f.appendChild(s);return s});
+steps.forEach(function(s,i){var bt=el("button","bt",s[0]);bt.onclick=function(){bx.forEach(function(x,j){x.classList.toggle("on",j<=i+0&&j<=s[2])});pan.innerHTML=s[1];[].forEach.call(btn.children,function(k){k.classList.remove("on")});bt.classList.add("on")};btn.appendChild(bt)});
+b.appendChild(f);b.appendChild(btn);b.appendChild(pan);pg.appendChild(b)}
+function chain(pg){var N=[
+["routes.txt","One row per bus route. <code>route_short_name</code> is the bus number people know.","5th Block HBR Layout ⇔ Kempegowda Bus Station,296-B,1,3,<b>4821</b>","route_id links to trips.txt"],
+["trips.txt","One row per run of a bus on a route. Has the route_id and a trip_id.","<b>1000</b>,1,Chandapura,0,KBS-3C UP,<b>1093</b>","trip_id links to stop_times.txt"],
+["stop_times.txt","The stops of each trip, in order (stop_sequence), with times. The biggest file we need (81 MB).","<b>34340</b>,17:45:00,17:45:00,<b>27263</b>,1,2nd Stage 9th Block Nagarabhavi","stop_id links to stops.txt"],
+["stops.txt","One row per stop (one per direction) with name and map position.","12th Block Nagarabhavi,,NBV12B,<b>21629</b>,(Towards AIT College),12.96018,77.51398,,","The end of the chain: a name and lat/lon"]];
+var b=el("div","box","<b>How the four GTFS files connect</b><p class='m'>Tap a file. The bold values are the keys that join files together.</p>"),f=el("div","flow"),pan=el("div","pan","Tap a file."),bs=[];
+N.forEach(function(n,i){var s=el("button","bt",n[0]);s.onclick=function(){bs.forEach(function(x){x.classList.remove("on")});s.classList.add("on");pan.innerHTML="<p>"+n[1]+"</p><pre>"+n[2]+"</pre><p class='k'>"+n[3]+"</p>"};bs.push(s);f.appendChild(s);if(i<3)f.appendChild(el("span","m","→"))});
+b.appendChild(f);b.appendChild(pan);pg.appendChild(b)}
+function csvdemo(pg){var b=el("div","box","<b>Try it: how Csv.split reads a line</b><p class='m'>Type a CSV line. Commas inside quotes stay inside one cell, like the Java code does.</p>"),i=el("input"),o=el("div","pan");
+i.value='12th Block,"Stop, Nagarabhavi",21629';
+function sp(l){var out=[],s="",q=false;for(var k=0;k<l.length;k++){var c=l[k];if(q){if(c=='"'){if(l[k+1]=='"'){s+='"';k++}else q=false}else s+=c}else if(c=='"')q=true;else if(c==","){out.push(s);s=""}else s+=c}out.push(s);return out}
+function u(){o.innerHTML="";var r=sp(i.value);o.appendChild(el("p","m",r.length+" cells:"));r.forEach(function(x){o.appendChild(el("span","ch",esc(x)||"(empty)"))})}
+i.oninput=u;u();b.appendChild(i);b.appendChild(o);pg.appendChild(b)}
+
+/* ---------- DAY 1 ---------- */
+var p1=document.getElementById("p1");
+p1.appendChild(el("h2","","Day 1: Create the project home on GitHub"));
+p1.appendChild(el("p","","<b>Goal:</b> a public GitHub repo named Salt-map, a copy of it on your computer, and a first commit. <b>Why it matters:</b> the repo is the proof of work on your resume, and open source needs it public."));
+stepper(p1,"The git journey of a change",["Your folder","Staging area","Local history","GitHub"],[
+["1 · git add","You pick which changed files go into the next save. Nothing is saved yet.",1],
+["2 · git commit","Git saves a snapshot of the staged files with your message. It is still only on your computer.",2],
+["3 · git push","Your new commits are uploaded. Now GitHub (and everyone) can see them.",3]]);
+p1.appendChild(el("h3","","Commands and steps"));
+cards(p1,[
+["github.com/new → name Salt-map, Public, add README, MIT License","Creates an empty online project folder, called a repository (repo).","It stores every version of your code and is the link you put on your resume. MIT License lets anyone use the code, which is what open source means.","A repo page with README and LICENSE files."],
+["cd D:\\","<code>cd</code> means change directory: it moves the terminal into the D: drive.","D: avoids OneDrive, which tries to sync the hidden .git folder and causes strange errors.","The prompt changes to PS D:\\>"],
+["git clone https://github.com/me-frhn/Salt-map.git","Downloads the repo into a new folder and remembers where it came from. That address is named <code>origin</code>.","Gives you a local copy that is connected to GitHub, so you can push later.","Cloning into ’Salt-map’… “Repository not found” meant the GitHub rename wasn’t done yet."],
+["code Salt-map","Opens the folder in VS Code.","You edit files and run the terminal inside the right folder.",""],
+["git remote set-url origin https://github.com/me-frhn/Salt-map.git","Changes the saved GitHub address for origin.","Only needed when a repo is renamed after cloning. GitHub redirects old links, but this keeps things clean.","No output means it worked."],
+["git status","Lists what changed since the last commit.","Always run it before committing so you know what will be saved.","nothing to commit, working tree clean"],
+["git add README.md","Puts that file in the staging area.","You choose exactly which changes go into the next commit.",""],
+["git commit -m \"Fix project name in README\"","Saves a snapshot of the staged files. <code>-m</code> gives the message.","Creates a history point you can go back to, with a note on why.","[main f9413dc] … 1 file changed"],
+["git push","Uploads your commits to GitHub.","Until you push, GitHub doesn’t have your work.","main -> main"]]);
+p1.appendChild(el("p","m","Lesson: name matters. The repo is Salt-map (capital S, no trailing s), and it is renamed in GitHub Settings → General."));
+
+/* ---------- DAY 2 ---------- */
+var p2=document.getElementById("p2");
+p2.appendChild(el("h2","","Day 2: Get the BMTC bus data"));
+p2.appendChild(el("p","","<b>Goal:</b> download Bengaluru’s bus data and understand what is inside. It comes in a standard format called <b>GTFS</b>, a set of CSV-style text files that every transit app understands."));
+chain(p2);
+p2.appendChild(el("h3","","Commands"));
+cards(p2,[
+["mkdir data\\gtfs","Makes the folders data and data\\gtfs.","A tidy place for the raw data, separate from the code.","If it says the folder exists, ignore it."],
+["Invoke-WebRequest -Uri \"https://github.com/Vonter/bmtc-gtfs/raw/refs/heads/main/gtfs/bmtc.zip\" -OutFile data\\bmtc.zip","PowerShell’s download command. <code>-Uri</code> is the link, <code>-OutFile</code> is where to save.","Fetches the community BMTC feed (the official source is tdh.dult-karnataka.com).","Silent for a while, then the prompt returns."],
+["Expand-Archive data\\bmtc.zip -DestinationPath data\\gtfs","Unzips the file into data\\gtfs.","The zip holds the text files we read.",""],
+["dir data\\gtfs","Lists the files in the folder.","Confirms what we got. We found fare_attributes.txt and fare_rules.txt, so fares can come from data.","12 files; shapes.txt (114 MB) and stop_times.txt (81 MB) are the biggest."],
+["Get-Content data\\gtfs\\stops.txt -TotalCount 5","Prints the first 5 lines of a file.","Peeks at the columns without opening a huge file.","A header line plus 4 stops."],
+["Get-Content data\\gtfs\\routes.txt -TotalCount 5 -Encoding UTF8","Same, but reads the file as UTF-8 text.","Without it, the ⇔ arrow showed as garbage characters. Our Java code also reads UTF-8.",""],
+["(Get-Content data\\gtfs\\stops.txt).Count - 1","Counts the lines, then subtracts 1 for the header row.","Gives the number of stops.","9960 stops (routes: 4434)."],
+["touch README.md","Creates an empty file (worked on your PC).","Starts data\\README.md, where we noted the source and the columns.",""],
+['Add-Content .gitignore "\u0060ndata/gtfs/\u0060ndata/*.zip"',"Appends two lines to .gitignore. The <code>\u0060n</code> means a new line.","Tells git to ignore the huge data files. Anyone can re-download them, and GitHub shouldn’t store 200 MB.","git status no longer lists data/gtfs."],
+["Remove-Item data\\.gitignore","Deletes a file.","Cleaned up the stray .gitignore created by running a command in the wrong folder.",""],
+["git add .gitignore data/README.md","Stages those two files.","Only the notes and the rules go to GitHub, not the data.",""]]);
+p2.appendChild(el("p","m","Lesson: check the prompt before running commands. PS D:\\Salt-map> is right. PS D:\\Salt-map\\data> made the paths wrong. Also, files differ in column order, so code must read columns by name, never by position."));
+
+/* ---------- DAY 3 ---------- */
+var p3=document.getElementById("p3");
+p3.appendChild(el("h2","","Day 3: Read the data with Java"));
+p3.appendChild(el("p","","<b>Goal:</b> a Java program that reads stops.txt and routes.txt into objects. The proof it works: it printed 9960 stops and 4434 routes, the same as the line counts from Day 2."));
+p3.appendChild(el("pre","",esc("Salt-map/\n├─ data/gtfs/          (ignored by git)\n├─ engine/\n│  ├─ src/saltmap/     Stop, Route, Csv, GtfsLoader, Main\n│  └─ out/             compiled classes (ignored by git)\n└─ README.md")));
+p3.appendChild(el("h3","","Commands"));
+cards(p3,[
+["java -version  /  javac -version","Shows the installed Java runtime and compiler versions.","The code uses <code>record</code>, which needs Java 17 or newer.",""],
+["mkdir engine\\src\\saltmap","Creates the folders for the Java files.","<code>saltmap</code> matches the <code>package saltmap;</code> line in every file.",""],
+["javac -d out (Get-ChildItem src\\saltmap\\*.java).FullName","<code>javac</code> compiles Java into class files. <code>-d out</code> puts them in an out folder. The part in brackets lists every .java file.","Java must be compiled before it runs.","No output means success."],
+["java -cp out saltmap.Main ..\\data\\gtfs","Runs the Main class. <code>-cp out</code> says where the compiled classes are. The last part is the data folder, which Main receives as an argument.","This is how you run the program.","Stops: 9960, Routes: 4434, plus sample rows."],
+["Add-Content .gitignore \"engine/out/\"","Ignores the compiled output.","Compiled files can be rebuilt, so they don’t belong in git.",""]]);
+p3.appendChild(el("h3","","The code, line by line"));
+p3.appendChild(el("p","m","Stop.java and Route.java are one-liners. A <code>record</code> is a tiny immutable object: Java writes the constructor and getters for you."));
+table(p3,[
+[R`public record Stop(String id, String name, String desc, double lat, double lon) {}`,"One stop: id (text, because ids like 20921_PF14 exist), name, direction text, and its position. After creation it can’t change."],
+[R`public record Route(String id, String shortName, String longName) {}`,"One route: id, the bus number (shortName, e.g. 296-B) and the long name."]]);
+p3.appendChild(el("p","","<b>Csv.java: reading one file row by row</b>"));
+table(p3,[
+[R`forEachRow(Path file, Consumer<Map<String,String>> action)`,"Takes a file and a piece of code (action) to run on each row."],
+[R`try (BufferedReader r = Files.newBufferedReader(file, UTF_8))`,"Opens the file as UTF-8 text. The try block closes it automatically."],
+[R`String line = r.readLine();`,"Reads the first line, the header."],
+[R`if (line.startsWith("\uFEFF")) line = line.substring(1);`,"Some files start with an invisible BOM character. This removes it so the first column name is clean."],
+[R`List<String> header = split(line);`,"Splits the header into column names."],
+[R`while ((line = r.readLine()) != null)`,"Reads one line at a time until the end. This streaming keeps memory small, which matters for the 81 MB file."],
+[R`Map<String,String> row = new HashMap<>();`,"One row becomes a map: column name → value."],
+[R`row.put(header.get(i), values.get(i));`,"Pairs each value with its column name. This is why order no longer matters."],
+[R`action.accept(row);`,"Hands the finished row to the caller."]]);
+p3.appendChild(el("p","","<b>Csv.split: cutting a line into cells</b>"));
+table(p3,[
+[R`boolean inQuotes = false;`,"Remembers whether we are inside quote marks."],
+[R`if (c == '"') ... else if (c == ',')`,"A quote switches inQuotes. A comma ends a cell only when we are outside quotes."],
+[R`sb.append('"'); i++;`,"Two quotes in a row inside quotes mean one real quote character."],
+[R`out.add(sb.toString()); sb.setLength(0);`,"Saves the finished cell and clears the builder for the next one."],
+[R`out.add(sb.toString());  // after the loop`,"The last cell has no comma after it, so it is added at the end."]]);
+csvdemo(p3);
+p3.appendChild(el("p","","<b>GtfsLoader.loadStops</b>"));
+table(p3,[
+[R`Map<String, Stop> stops = new HashMap<>();`,"A dictionary: stop_id → Stop, so we can find any stop instantly."],
+[R`Csv.forEachRow(dir.resolve("stops.txt"), r -> {`,"Reads stops.txt and runs the code in braces for each row r."],
+[R`if (lat == null || lat.isBlank() ...) return;`,"Skips rows with no position, because they can’t be used on a map."],
+[R`Double.parseDouble(lat)`,"Turns the text 12.96018 into a number."],
+[R`stops.put(r.get("stop_id"), new Stop(...));`,"Builds the Stop object and stores it under its id. loadRoutes works the same way."]]);
+p3.appendChild(el("p","","<b>Main.java</b>"));
+table(p3,[
+[R`Path dir = Path.of(args.length > 0 ? args[0] : "../data/gtfs");`,"Uses the folder given on the command line, or a default."],
+[R`GtfsLoader.loadStops(dir)  /  loadRoutes(dir)`,"Loads both files into memory."],
+[R`System.out.println("Stops:  " + stops.size());`,"Prints the count. It should be 9960, matching Day 2."],
+[R`stops.values().stream().filter(...).limit(5)`,"Takes only matching stops, at most 5, to print samples."]]);
+p3.appendChild(el("p","m","Next, Day 4: parse trips.txt and stop_times.txt and build each route’s ordered stop list."));
+
+/* ---------- tabs ---------- */
+var nav=document.getElementById("nav"),pgs=["p1","p2","p3"];
+["Day 1","Day 2","Day 3"].forEach(function(t,i){var b=el("button",i?"":"on",t);b.onclick=function(){[].forEach.call(nav.children,function(x,j){x.classList.toggle("on",i===j);document.getElementById(pgs[j]).classList.toggle("on",i===j)})};nav.appendChild(b)});
+</script>
+</body>
+</html>

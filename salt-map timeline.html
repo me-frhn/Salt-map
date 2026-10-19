@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>salt-map timeline</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f6f4fa;--card:#fff;--ink:#1d1a26;--mute:#6b657a;--line:#7a3fa0;--done:#1f9d55;--today:#f2b705;--bd:#e2dcee;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15121c;--card:#1f1b2a;--ink:#efeaf8;--mute:#a59cb8;--line:#b27ad6;--done:#4cc27f;--today:#f2c94c;--bd:#322b44}}
+:root[data-theme="dark"]{--bg:#15121c;--card:#1f1b2a;--ink:#efeaf8;--mute:#a59cb8;--line:#b27ad6;--done:#4cc27f;--today:#f2c94c;--bd:#322b44}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+main{max-width:680px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:2rem;font-weight:800;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 16px}
+.prog{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:10px 0;z-index:5}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--done);transition:width .3s}
+.pt{font-size:.9rem;color:var(--mute);margin-top:6px}
+h2{font-size:1.15rem;margin:28px 0 2px}
+.wk{color:var(--mute);font-size:.9rem;margin:0 0 8px}
+ul{list-style:none;margin:0;padding:0 0 0 22px;border-left:4px solid var(--line)}
+li{position:relative;margin:0 0 8px}
+li::before{content:"";position:absolute;left:-31px;top:14px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--line)}
+li.done::before{background:var(--done);border-color:var(--done)}
+li.today::before{border-color:var(--today);background:var(--today)}
+label{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;cursor:pointer}
+li.today label{border-color:var(--today)}
+input{margin-top:4px;width:18px;height:18px;accent-color:var(--done);flex:none}
+.d{min-width:76px;font-weight:600;font-size:.9rem}
+.t{flex:1}
+li.done .t{color:var(--mute);text-decoration:line-through}
+.rest .t{color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<h1>salt-map timeline</h1>
+<p class="sub">Bengaluru bus routes and ride prices, as an open-source browser extension. Tick a day when it’s done.</p>
+<div class="prog"><div class="bar"><i id="b"></i></div><div class="pt" id="p"></div></div>
+<div id="root"></div>
+</main>
+<script>
+var START=new Date(2026,9,19);
+var W=[
+["Week 1: Repo and data",["Create the GitHub repo, add MIT license and a README stub","Download BMTC GTFS data and read stops.txt and routes.txt","Parse stops and routes in code (Java or JS)","Parse trips and stop_times, build each route’s stop sequence","Build the graph: stops as nodes, bus hops as edges","Print a direct bus route between two stops","Rest or catch up. Write short notes on week 1"]],
+["Week 2: Routing engine",["Add shortest path (Dijkstra) over the graph","Add transfer logic, up to 2 transfers","Add BMTC stage-based fare calculation","Find the nearest stops for any lat/lng","Write tests for 5 real Bengaluru trips","Wrap the engine in a small local API","Rest or catch up"]],
+["Week 3: Ride prices",["Set up OSRM for distance and time","Collect current Bengaluru auto fare rules","Collect typical Uber and Rapido rates, write the fare formula","Add auto, bike taxi and cab estimates to the API","Build Uber and Rapido deep links","Compare formula vs real app prices on 5 trips","Rest or catch up"]],
+["Week 4: The extension",["Extension skeleton: Manifest V3 and side panel","Read origin and destination from the Google Maps URL","Call the API and show the bus steps","Show the price comparison cards","Handle errors: no route, no data","Test on 10 real trips and fix bugs","Rest or catch up"]],
+["Week 5: Ship it",["Write the README with screenshots and a demo GIF","Add CONTRIBUTING and a few good first issues","Prepare Chrome Web Store assets","Submit to the Chrome Web Store","Host the API on a free tier","Post on LinkedIn and ask for feedback","Add to your resume with one line on impact"]]
+];
+var M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],D=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var S={};try{S=JSON.parse(localStorage.getItem("saltmap")||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem("saltmap",JSON.stringify(S))}catch(e){}}
+var now=new Date();now.setHours(0,0,0,0);
+var root=document.getElementById("root"),n=0,total=0;
+W.forEach(function(w,wi){
+var f=new Date(START);f.setDate(f.getDate()+wi*7);var l=new Date(f);l.setDate(l.getDate()+6);
+var h=document.createElement("h2");h.textContent=w[0];root.appendChild(h);
+var s=document.createElement("p");s.className="wk";s.textContent=f.getDate()+" "+M[f.getMonth()]+" to "+l.getDate()+" "+M[l.getMonth()];root.appendChild(s);
+var ul=document.createElement("ul");
+w[1].forEach(function(t,i){
+var d=new Date(f);d.setDate(d.getDate()+i);var id="d"+(n++);total++;
+var li=document.createElement("li");
+if(S[id])li.className="done";
+if(d.getTime()===now.getTime())li.className+=" today";
+if(t.indexOf("Rest")===0)li.className+=" rest";
+var lb=document.createElement("label");
+var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!S[id];
+cb.onchange=function(){S[id]=cb.checked;li.classList.toggle("done",cb.checked);save();upd()};
+var dd=document.createElement("span");dd.className="d";dd.textContent=D[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];
+var tt=document.createElement("span");tt.className="t";tt.textContent=t;
+lb.appendChild(cb);lb.appendChild(dd);lb.appendChild(tt);li.appendChild(lb);ul.appendChild(li)});
+root.appendChild(ul)});
+function upd(){var c=0;for(var k in S)if(S[k])c++;
+document.getElementById("b").style.width=(c/total*100)+"%";
+document.getElementById("p").textContent=c+" of "+total+" days done"}
+upd();
+var t=document.querySelector("li.today");if(t)t.scrollIntoView({block:"center"});
+</script>
+</body>
+</html>
